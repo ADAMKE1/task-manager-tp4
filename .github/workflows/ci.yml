@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Tests
+        run: mvn -B clean test
+
+      # Quality check : à enrichir (Checkstyle, SpotBugs, JaCoCo…)
+
+      - name: Package
+        run: mvn -B package -DskipTests
+
+      - name: Docker build
+        run: docker build -t task-manager:ci .
